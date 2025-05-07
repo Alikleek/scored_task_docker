@@ -7,11 +7,12 @@ This is a docker compose file that builds a fastapi application with postgre as 
 │  ├── app/ \
 │  │    └── main.py\
 │  ├── requirements.txt\
-│  ├── Dockerfile\
-│  └── docker-compose.yml\
+│  └── Dockerfile\
 │\
 └── nginx/\
      └── nginx.conf
+│\
+└── docker-compose.yml\
 
 
 ## FastAPI app
@@ -174,3 +175,4 @@ volumes:
 ## Future improvments
 1- fixing remaining FastAPI image vulnerabilities\
 2- adding a non-root user to run NGINx\
+3- finding suitable multistage build for FastAPI app
