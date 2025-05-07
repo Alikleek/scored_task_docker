@@ -42,3 +42,28 @@ Using the bitnami image the Postgre image is smaller than the official image -10
 
 ### 4- Redis
 The official redis alpine had no vulnerablities and was lightweight so it didn't need any alteration 
+
+## Security check
+
+### 1-FastAPI app
+after initial image build this was the security scan
+
+![alt text](./img/trivvy1.png)
+
+after some fixes this is the latest security scan
+
+![alt text](./img/trivvy2.png)
+
+### 2-NGINX
+The scan showed no vulnerabilities so no fixes were needed
+
+![alt text](./img/trivvy3.png)
+
+
+## Running app
+Using command
+
+$ docker compose build .
+$ docker compose up
+
+
