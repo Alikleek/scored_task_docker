@@ -48,22 +48,129 @@ The official redis alpine had no vulnerablities and was lightweight so it didn't
 ### 1-FastAPI app
 after initial image build this was the security scan
 
-![alt text](./img/trivvy1.png)
+![initial scan](./img/trivvy1.png)
 
 after some fixes this is the latest security scan
 
-![alt text](./img/trivvy2.png)
+![final scan](./img/trivvy2.png)
 
 ### 2-NGINX
 The scan showed no vulnerabilities so no fixes were needed
 
-![alt text](./img/trivvy3.png)
+![NGINX sec](./img/trivvy3.png)
 
 
 ## Running app
 Using command
 
-$ docker compose build .
-$ docker compose up
+```bash
+docker-compose build\
+docker-compose up\
+```
+
+the containers should output as follow
+![inside running container](./img/run1.png)
 
 
+### Health check
+
+
+```bash
+curl http://localhost/health
+```
+
+
+output:\
+![health check](./img/run2.png)
+
+
+### Entering data 
+
+
+```bash
+curl -X POST http://localhost/notes/ -H "Content-Type: application/json" -d '{"title":"Hello","content":"This is a test"}'
+```
+
+output:\
+![input 1](./img/run3.png)
+
+### Reading data
+
+
+```bash
+curl http://localhost/notes/1
+```
+
+output:\
+![output1](./img/run4.png)
+
+### Cache 
+after stopping the container and running it again we run this command\
+
+```bash
+curl http://localhost/notes/1\
+```
+
+
+which will output the previously written data found in the redis cache
+
+![cached data](./img/cache.png)
+
+
+## Docker compose file
+
+```yaml
+version: '3.8'
+
+services:
+  fastapi:
+    build: ./fastapi-app
+    container_name: fastapi
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  db:
+    image: bitnami/postgresql:17.4.0
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    
+    depends_on:
+      - fastapi
+
+volumes:
+  redis_data:
+  postgres_data:
+```
+
+
+## Future improvments
+1- fixing remaining FastAPI image vulnerabilities\
+2- adding a non-root user to run NGINx\
